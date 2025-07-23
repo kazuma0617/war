@@ -2,7 +2,7 @@
 // 単一責任の原則：クラスは一つの責任を持つ
 
 class Card{
-    public $suit;
+    public $suit; //スート（トランプの絵柄）
     public $rank;
     private static $strength = [
         '2' => 2, '3' => 3, '4' => 4, '5' => 5,
@@ -19,6 +19,7 @@ class Card{
         return self::$strength[$this->rank];
     }
 
+    //インスタンスがechoなどsting型が要求されえたとき呼ばれる。
     public function __toString() {
         return "{$this->suit}の{$this->rank}";
     }
@@ -42,8 +43,9 @@ class Deck{
         shuffle($this->cards);
     }
 
+    //トランプの山札をプレイヤーに均等に配る処理
     public function deal($numPlayers) {
-        $hands = array_fill(0, $numPlayers, []);
+        $hands = array_fill(0, $numPlayers, []); //array_fill — 配列を指定した値で埋める
         foreach ($this->cards as $index => $card) {
             $hands[$index % $numPlayers][] = $card;
         }
@@ -65,7 +67,7 @@ class Player{
     }
 
     public function addCards($cards) {
-        $this->hand = array_merge($this->hand, $cards);
+        $this->hand = array_merge($this->hand, $cards); //勝ったプレイヤーが場札を全部もらう
     }
 
 }
@@ -85,8 +87,9 @@ class Game{
     public function play() {
         echo "戦争を開始します。\n";
         echo "カードが配られました。\n";
+        sleep(2);
 
-        $pile = [];
+        $pile = [];//場に出たカードを貯める
         $this->battle($pile);
 
         echo "戦争を終了します。\n";
@@ -99,7 +102,9 @@ class Game{
         $card2 = $this->player2->drawCard();
 
         echo "{$this->player1->name}のカードは{$card1}です。\n";
+        sleep(2);
         echo "{$this->player2->name}のカードは{$card2}です。\n";
+        sleep(2);
 
         $pile[] = $card1;
         $pile[] = $card2;
