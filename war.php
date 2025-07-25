@@ -1,5 +1,6 @@
 <?php
 // 単一責任の原則：クラスは一つの責任を持つ
+// 必要なオブジェクト（人、カード、デッキ、ゲーム）
 
 class Card{
     public $suit; //スート（トランプの絵柄）
@@ -56,23 +57,53 @@ class Deck{
 class Player{
     public $name;
     public $hand;
+    private $stock = [];
 
     public function __construct($name, $hand) {
         $this->name = $name;
         $this->hand = $hand;
     }
 
+    // 手札がなくなるとストックのカードを追加
     public function drawCard() {
+        if(empty($this->hand)){
+            $this->reloadHandFromStock();
+        }
         return array_shift($this->hand);
     }
 
     public function addCards($cards) {
-        $this->hand = array_merge($this->hand, $cards); //勝ったプレイヤーが場札を全部もらう
+        $this->stock = array_merge($this->stock, $cards);
+    }
+
+    private function reloadHandFromStock() {
+        if (!empty($this->stock)) {
+            shuffle($this->stock);
+            $this->hand = $this->stock;
+            $this->stock = [];
+            echo "{$this->name}はストックから手札を補充しました。\n";
+        }
+    }
+
+    // 手札が残っているか判断
+    public function hasCards() {
+        return count($this->hand) > 0 || count($this->stock) > 0;
+    }
+
+    public function cardCount() {
+        return count($this->hand) + count($this->stock);
     }
 
 }
 
 class Game{
+    // 手札がなくなるまでループで戦争を繰り返すようにします。
+
+// 引き分けの場合は手札がある限り再戦。
+
+// 勝敗が決まったらそのプレイヤーが場のカードを獲得。
+
+// 誰かの手札がなくなった時点で、残りカード枚数から順位を表示します。
     private $player1;
     private $player2;
 
@@ -87,12 +118,16 @@ class Game{
     public function play() {
         echo "戦争を開始します。\n";
         echo "カードが配られました。\n";
-        sleep(2);
+        // sleep(1);
 
-        $pile = [];//場に出たカードを貯める
-        $this->battle($pile);
+        while($this->player1->hasCards() && $this->player2->hasCards()){
+            $pile = [];
+            $this->battle($pile);
+            // sleep(1);
+        
+        }
 
-        echo "戦争を終了します。\n";
+        $this->printResult();
     }
 
     private function battle(&$pile) {
@@ -102,9 +137,9 @@ class Game{
         $card2 = $this->player2->drawCard();
 
         echo "{$this->player1->name}のカードは{$card1}です。\n";
-        sleep(2);
+        // sleep(1);
         echo "{$this->player2->name}のカードは{$card2}です。\n";
-        sleep(2);
+        // sleep(1);
 
         $pile[] = $card1;
         $pile[] = $card2;
@@ -113,15 +148,37 @@ class Game{
         $strength2 = $card2->getStrength();
 
         if ($strength1 > $strength2) {
-            echo "{$this->player1->name}が勝ちました。\n";
+            echo "{$this->player1->name}が勝ちました。{$this->player1->name}はカードを" . count($pile) . "枚もらいました。\n";
             $this->player1->addCards($pile);
         } elseif ($strength2 > $strength1) {
-            echo "{$this->player2->name}が勝ちました。\n";
+            echo "{$this->player2->name}が勝ちました。{$this->player2->name}はカードを" . count($pile) . "枚もらいました。\n";
             $this->player2->addCards($pile);
         } else {
             echo "引き分けです。\n";
-            // 引き分け時は追加カードで再戦（1回だけ）
-            $this->battle($pile);
+            // 再戦（再帰）
+            if ($this->player1->hasCards() && $this->player2->hasCards()) {
+                $this->battle($pile);
+            } else {
+                echo "どちらかの手札がなくなったため、引き分けのまま戦争を終了します。\n";
+            }
+        }
+    }
+
+    private function printResult() {
+        echo "戦争を終了します。\n";
+
+        $count1 = $this->player1->cardCount();
+        $count2 = $this->player2->cardCount();
+
+        echo "{$this->player1->name}の手札の枚数は{$count1}枚です。\n";
+        echo "{$this->player2->name}の手札の枚数は{$count2}枚です。\n";
+
+        if ($count1 > $count2) {
+            echo "{$this->player1->name}が1位、{$this->player2->name}が2位です。\n";
+        } elseif ($count2 > $count1) {
+            echo "{$this->player2->name}が1位、{$this->player1->name}が2位です。\n";
+        } else {
+            echo "引き分けです。\n";
         }
     }
 
