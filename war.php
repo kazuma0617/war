@@ -94,6 +94,13 @@ class Player{
 }
 
 class Game{
+    // 手札がなくなるまでループで戦争を繰り返すようにします。
+
+// 引き分けの場合は手札がある限り再戦。
+
+// 勝敗が決まったらそのプレイヤーが場のカードを獲得。
+
+// 誰かの手札がなくなった時点で、残りカード枚数から順位を表示します。
     private $player1;
     private $player2;
 
@@ -107,6 +114,7 @@ class Game{
     public function play() {
         echo "戦争を開始します。\n";
         echo "カードが配られました。\n";
+<<<<<<< HEAD
 
         // 手札がなくなるまでループで戦争を繰り返す
         while($this->player1->hasCards() && $this->player2->hasCards()){
@@ -115,6 +123,17 @@ class Game{
         }
 
         // 誰かの手札がなくなった時点で、残りカード枚数から順位を表示します。
+=======
+        // sleep(1);
+
+        while($this->player1->hasCards() && $this->player2->hasCards()){
+            $pile = [];
+            $this->battle($pile);
+            // sleep(1);
+        
+        }
+
+>>>>>>> 8815cae4e493ee25fc8ccf68a12dd223a0a34be2
         $this->printResult();
     }
 
@@ -125,7 +144,13 @@ class Game{
         $card2 = $this->player2->drawCard();
 
         echo "{$this->player1->name}のカードは{$card1}です。\n";
+<<<<<<< HEAD
         echo "{$this->player2->name}のカードは{$card2}です。\n";
+=======
+        // sleep(1);
+        echo "{$this->player2->name}のカードは{$card2}です。\n";
+        // sleep(1);
+>>>>>>> 8815cae4e493ee25fc8ccf68a12dd223a0a34be2
 
         $pile[] = $card1;
         $pile[] = $card2;
@@ -142,7 +167,11 @@ class Game{
             $this->player2->addCards($pile);
         } else {
             echo "引き分けです。\n";
+<<<<<<< HEAD
             // 引き分けの場合は手札がある限り再戦。
+=======
+            // 再戦（再帰）
+>>>>>>> 8815cae4e493ee25fc8ccf68a12dd223a0a34be2
             if ($this->player1->hasCards() && $this->player2->hasCards()) {
                 $this->battle($pile);
             } else {
